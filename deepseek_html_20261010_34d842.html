@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python: 40 задач на переменные, print и арифметику</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --bg: #eef2f9; --card: #ffffff; --ink: #0f172a; --muted: #475569;
+    --line: #e2e8f0; --brand: #3b82f6; --brand-d: #1d4ed8;
+    --ok: #10b981; --warn: #f59e0b; --danger: #ef4444;
+  }
+  body{
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    background: var(--bg); color: var(--ink);
+    line-height: 1.6; padding: 1.5rem 1rem;
+  }
+  .wrap{ max-width: 1080px; margin: 0 auto; }
+
+  header.top{
+    background: linear-gradient(120deg, #1e3a8a, #3b82f6);
+    color: #fff; padding: 1.5rem 1.8rem; border-radius: 22px;
+    box-shadow: 0 12px 30px -14px rgba(0,0,0,.4); margin-bottom: 1.2rem;
+  }
+  header.top h1{ font-size: 1.5rem; letter-spacing: -.4px; }
+  header.top p{ opacity: .92; font-size: .95rem; margin-top: .3rem; }
+
+  .status-bar{
+    background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    padding: .8rem 1.1rem; margin-bottom: 1.2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 1rem; flex-wrap: wrap;
+    box-shadow: 0 8px 20px -18px rgba(15,23,42,.3);
+    position: sticky; top: .5rem; z-index: 30;
+  }
+  .status-bar .prog{ font-weight: 600; color: var(--brand-d); }
+  .status-bar .prog span{ color: var(--ok); }
+  .status-bar .badge-info{ font-size: .85rem; color: var(--muted); }
+
+  .filter-bar{
+    background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    padding: .6rem .9rem; margin-bottom: 1rem;
+    display: flex; gap: .4rem; flex-wrap: wrap; align-items: center;
+  }
+  .filter-bar b{ font-size: .9rem; color: var(--muted); margin-right: .3rem; }
+  .filter-bar button{
+    border: 1px solid var(--line); background: #f8fafc; color: var(--ink);
+    padding: .35rem .8rem; border-radius: 999px; cursor: pointer;
+    font-size: .85rem; font-weight: 600;
+  }
+  .filter-bar button.active{ background: var(--brand); color: #fff; border-color: var(--brand); }
+
+  .task{
+    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+    padding: 1.4rem 1.6rem; margin-bottom: 1.4rem;
+    box-shadow: 0 14px 30px -26px rgba(15,23,42,.35);
+    transition: border-color .2s, background .2s;
+  }
+  .task.solved{
+    border-color: var(--ok);
+    background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 60%);
+  }
+  .task.hidden{ display: none; }
+
+  .task-head{
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 1rem; flex-wrap: wrap; margin-bottom: .8rem;
+  }
+  .task-title{
+    font-size: 1.15rem; font-weight: 700; color: var(--ink);
+    display: flex; align-items: center; gap: .55rem; flex-wrap: wrap;
+  }
+  .task-title .num{
+    background: var(--brand); color: #fff; min-width: 2rem; height: 2rem;
+    padding: 0 .6rem; border-radius: 10px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .95rem;
+  }
+  .difficulty{
+    font-size: .78rem; padding: .2rem .65rem; border-radius: 999px;
+    font-weight: 700; letter-spacing: .3px;
+  }
+  .diff-1{ background: #dcfce7; color: #166534; }
+  .diff-2{ background: #fef3c7; color: #92400e; }
+  .diff-3{ background: #fee2e2; color: #991b1b; }
+
+  .tag-input{
+    font-size: .72rem; padding: .15rem .55rem; border-radius: 999px;
+    background: #e0e7ff; color: #3730a3; font-weight: 700;
+  }
+
+  .task-desc{ color: #1e293b; margin-bottom: .9rem; font-size: 1rem; }
+  .task-desc code{
+    background: #eef2f6; padding: .1rem .45rem; border-radius: 6px;
+    font-family: 'JetBrains Mono', Consolas, monospace; font-size: .9em;
+  }
+
+  .io-block{
+    background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px;
+    padding: .7rem 1rem; margin-bottom: .9rem; font-size: .9rem;
+  }
+  .io-block b{ color: var(--brand-d); }
+  .io-block pre{
+    background: #0f172a; color: #e2e8f0; padding: .6rem .8rem;
+    border-radius: 8px; margin: .35rem 0 0;
+    font-family: 'JetBrains Mono', monospace; font-size: .85rem;
+    overflow-x: auto; white-space: pre-wrap;
+  }
+
+  .editor-wrap{
+    display: flex; gap: 0; margin-bottom: .8rem;
+    border: 1px solid #1e293b; border-radius: 12px; overflow: hidden;
+    background: #0f172a;
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 14px; line-height: 1.55;
+    position: relative;
+  }
+  .line-numbers{
+    background: #1e293b; color: #64748b; padding: .7rem .6rem;
+    text-align: right; user-select: none; font-size: 13px;
+    line-height: 1.55; min-width: 2.8rem; white-space: pre;
+    overflow: hidden;
+  }
+  .editor-wrap textarea{
+    flex: 1; background: transparent; color: #e2e8f0; border: none;
+    outline: none; padding: .7rem .9rem; resize: vertical;
+    font-family: inherit; font-size: inherit; line-height: inherit;
+    min-height: 130px; tab-size: 4; white-space: pre;
+    overflow-wrap: normal; overflow-x: auto;
+    caret-color: #60a5fa;
+  }
+  .editor-wrap textarea::selection{ background: #3b82f6; color: #fff; }
+  .editor-wrap textarea:focus{ background: rgba(59,130,246,.05); }
+
+  .result-row{
+    display: none; gap: .6rem; align-items: center;
+    margin: .6rem 0; flex-wrap: wrap;
+  }
+  .result-row.show{ display: flex; }
+  .result-row label{ font-weight: 600; color: var(--ink); font-size: .95rem; }
+  .result-row input{
+    flex: 1; min-width: 180px; padding: .55rem .85rem;
+    border: 1px solid var(--line); border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace; font-size: .95rem;
+    background: #fff; color: var(--ink);
+  }
+  .result-row input:focus{ outline: 2px solid var(--brand); border-color: var(--brand); }
+  .result-row .note{
+    font-size: .82rem; color: var(--muted); font-style: italic; width: 100%;
+  }
+
+  .actions{
+    display: flex; gap: .55rem; flex-wrap: wrap; margin-top: .4rem;
+  }
+  button{
+    font-family: inherit; border: 1px solid var(--line);
+    background: #f1f5f9; color: var(--ink);
+    padding: .5rem 1rem; border-radius: 10px; cursor: pointer;
+    font-size: .92rem; font-weight: 600; transition: all .15s;
+  }
+  button:hover{ background: #e2e8f0; }
+  button.primary{
+    background: var(--brand); color: #fff; border-color: var(--brand);
+  }
+  button.primary:hover{ background: var(--brand-d); }
+  button.ghost{ background: #fff; }
+  button.hint-btn{
+    background: #fef9e7; border-color: #fcd34d; color: #92400e;
+  }
+  button.hint-btn:hover{ background: #fef3c7; }
+
+  .output{
+    margin-top: .7rem; border-radius: 12px; padding: .85rem 1rem;
+    font-size: .93rem; line-height: 1.5; display: none;
+  }
+  .output.show{ display: block; }
+  .output.ok{ background: #f0fdf4; border-left: 5px solid var(--ok); color: #064e3b; }
+  .output.fail{ background: #fff5f5; border-left: 5px solid var(--danger); color: #7f1d1d; }
+  .output.warn{ background: #fef9e7; border-left: 5px solid var(--warn); color: #78350f; }
+  .output.info{ background: #eff6ff; border-left: 5px solid var(--brand); color: #1e3a8a; }
+  .output .label{
+    display: inline-block; font-weight: 700;
+    padding: .1rem .55rem; border-radius: 6px;
+    margin-bottom: .4rem; font-size: .8rem;
+  }
+  .output.ok .label{ background: var(--ok); color: #fff; }
+  .output.fail .label{ background: var(--danger); color: #fff; }
+  .output.warn .label{ background: var(--warn); color: #fff; }
+  .output.info .label{ background: var(--brand); color: #fff; }
+  .output pre{
+    background: #0f172a; color: #e2e8f0;
+    padding: .6rem .8rem; border-radius: 8px;
+    margin-top: .4rem; font-family: 'JetBrains Mono', monospace;
+    font-size: .85rem; overflow-x: auto; white-space: pre-wrap;
+  }
+
+  .hint-box{
+    display: none; margin-top: .6rem; background: #fef9e7;
+    border-left: 5px solid var(--warn); border-radius: 10px;
+    padding: .8rem 1rem; color: #78350f; font-size: .95rem;
+  }
+  .hint-box.show{ display: block; }
+  .hint-box ol{ padding-left: 1.4rem; margin-top: .3rem; }
+  .hint-box li{ margin-bottom: .3rem; }
+
+  .solution-box{
+    display: none; margin-top: .6rem; background: #ecfdf5;
+    border-left: 5px solid var(--ok); border-radius: 10px;
+    padding: .8rem 1rem; color: #064e3b; font-size: .95rem;
+  }
+  .solution-box.show{ display: block; }
+  .solution-box pre{
+    background: #0f172a; color: #e2e8f0;
+    padding: .7rem .9rem; border-radius: 8px;
+    margin-top: .5rem; font-family: 'JetBrains Mono', monospace;
+    font-size: .88rem; overflow-x: auto; white-space: pre-wrap;
+  }
+
+  .badge-solved{
+    background: var(--ok); color: #fff; font-size: .8rem;
+    padding: .2rem .7rem; border-radius: 999px; font-weight: 700;
+  }
+
+  .footer-note{
+    text-align: center; color: var(--muted);
+    font-size: .88rem; margin: 2rem 0 1rem;
+  }
+
+  @media (max-width: 600px){
+    body{ padding: 1rem .6rem; }
+    header.top{ padding: 1.1rem 1.2rem; }
+    header.top h1{ font-size: 1.15rem; }
+    .task{ padding: 1.1rem 1rem; }
+    .task-title{ font-size: 1rem; }
+    .editor-wrap{ font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>🐍 40 задач: переменные, print и арифметика</h1>
+    <p>Код запускается прямо в браузере — ты видишь реальный вывод программы. Проверка сверяет его с ожидаемым.</p>
+  </header>
+
+  <div class="status-bar">
+    <div class="prog">Решено: <span id="solvedCount">0</span> / <span id="totalCount">0</span></div>
+    <div class="badge-info">Tab = 4 пробела · Ctrl+Enter = запуск</div>
+  </div>
+
+  <div class="filter-bar" id="filterBar">
+    <b>Фильтр:</b>
+    <button data-filter="all" class="active">Все</button>
+    <button data-filter="1">Легко</button>
+    <button data-filter="2">Средне</button>
+    <button data-filter="3">Сложно</button>
+    <button data-filter="solved">Решённые</button>
+    <button data-filter="unsolved">Не решённые</button>
+  </div>
+
+  <div id="tasks"></div>
+
+  <div class="footer-note">Совет: сначала попробуй сам, потом смотри подсказки. Решение откроется только после победы.</div>
+</div>
+
+<script>
+/* =============================================================
+   МИНИ-ИНТЕРПРЕТАТОР PYTHON (JavaScript)
+   Поддерживает:
+   - присваивания: x = 5   name = 'Аня'
+   - print(...) с несколькими аргументами
+   - арифметику: + - * / // % **  и скобки
+   - строки, конкатенацию через +
+   - функции: int(), float(), str(), abs(), round(), len()
+   - f-строки простого вида: f"..." или f'...' с {переменная}
+   ============================================================= */
+function runPythonMini(code){
+  const output = [];
+  const vars = Object.create(null);
+
+  // ---- Утилита: представление значения как в Python ----
+  function pyRepr(v){
+    if (typeof v === 'string') return v;
+    if (typeof v === 'boolean') return v ? 'True' : 'False';
+    if (typeof v === 'number'){
+      if (Number.isInteger(v)) return String(v);
+      return String(v);
+    }
+    if (v === null || v === undefined) return 'None';
+    return String(v);
+  }
+
+  // ---- Токенизация выражения (без полного парсера) ----
+  // Используем безопасный eval через Function, но с осторожностью.
+
+  function safeEval(expr){
+    // Заменяем питоновские операторы на js
+    let jsExpr = expr;
+
+    // ** → Math.pow(a, b) — сложно без парсера, поэтому заменим на временную
+    // функцию __pow(a, b). Разберём через регулярку a ** b → __pow(a, b)
+    // Простая поддержка: число ** число, переменная ** число, число ** переменная
+    // Обрабатываем несколько раз, чтобы вложенные работали.
+    let prev;
+    do {
+      prev = jsExpr;
+      jsExpr = jsExpr.replace(
+        /(-?\d+\.?\d*|[A-Za-z_][\w]*)\s*\*\*\s*(-?\d+\.?\d*|[A-Za-z_][\w]*)/g,
+        '__pow($1, $2)'
+      );
+    } while (jsExpr !== prev);
+
+    // // → целочисленное деление. Заменим a // b на Math.trunc(a / b)
+    do {
+      prev = jsExpr;
+      jsExpr = jsExpr.replace(
+        /(-?\d+\.?\d*|[A-Za-z_][\w]*|\([^()]*\))\s*\/\/\s*(-?\d+\.?\d*|[A-Za-z_][\w]*|\([^()]*\))/g,
+        'Math.trunc($1 / $2)'
+      );
+    } while (jsExpr !== prev);
+
+    // int(...) → __int(...)
+    jsExpr = jsExpr.replace(/\bint\s*\(/g, '__int(');
+    jsExpr = jsExpr.replace(/\bfloat\s*\(/g, '__float(');
+    jsExpr = jsExpr.replace(/\bstr\s*\(/g, '__str(');
+    jsExpr = jsExpr.replace(/\babs\s*\(/g, 'Math.abs(');
+    jsExpr = jsExpr.replace(/\bround\s*\(/g, '__round(');
+    jsExpr = jsExpr.replace(/\blen\s*\(/g, '__len(');
+
+    // true/false → True/False уже не появятся, но на всякий случай
+    // Подставляем переменные из окружения
+    // Разрешаем только имена переменных
+    try {
+      const names = Object.keys(vars);
+      const values = names.map(n => vars[n]);
+      const fn = new Function(...names, '__pow', '__int', '__float', '__str', '__round', '__len', `
+        "use strict";
+        try { return (${jsExpr}); } catch(e){ throw new Error("Не могу вычислить: " + e.message); }
+      `);
+      return fn(
+        ...values,
+        (a,b) => Math.pow(a,b),
+        (x) => { if (typeof x === 'string'){ const n = parseFloat(x); if (isNaN(n)) throw new Error('int() от нечисла'); return Math.trunc(n); } return Math.trunc(Number(x)); },
+        (x) => Number(x),
+        (x) => pyRepr(x),
+        (x) => Math.round(x),
+        (x) => (x == null) ? 0 : (typeof x === 'string' ? x.length : (Array.isArray(x) ? x.length : 0))
+      );
+    } catch (e) {
+      throw new Error('Ошибка в выражении «' + expr + '»: ' + e.message);
+    }
+  }
+
+  // ---- Разбор строки с f-строкой ----
+  function parseFString(raw){
+    // raw уже без префикса f и кавычек
+    return raw.replace(/\{([^{}]+)\}/g, (_, expr) => pyRepr(safeEval(expr)));
+  }
+
+  // ---- Разделение строки по запятым на верхнем уровне (не внутри скобок и кавычек) ----
+  function splitTopLevel(s, sep=','){
+    const parts = [];
+    let depth = 0, quote = null, buf = '';
+    for (let i = 0; i < s.length; i++){
+      const ch = s[i];
+      if (quote){
+        buf += ch;
+        if (ch === quote) quote = null;
+        continue;
+      }
+      if (ch === '"' || ch === "'"){ quote = ch; buf += ch; continue; }
+      if (ch === '(' || ch === '[' || ch === '{'){ depth++; buf += ch; continue; }
+      if (ch === ')' || ch === ']' || ch === '}'){ depth--; buf += ch; continue; }
+      if (ch === sep && depth === 0){ parts.push(buf); buf = ''; continue; }
+      buf += ch;
+    }
+    if (buf !== '' || parts.length) parts.push(buf);
+    return parts;
+  }
+
+  // ---- Разбор строки кода на токены (упрощённый) ----
+  const lines = code.split('\n');
+
+  for (let rawLine of lines){
+    let line = rawLine;
+    // Убираем комментарии (# вне строки)
+    {
+      let inQ = null, cut = -1;
+      for (let i = 0; i < line.length; i++){
+        const c = line[i];
+        if (inQ){ if (c === inQ) inQ = null; continue; }
+        if (c === '"' || c === "'"){ inQ = c; continue; }
+        if (c === '#'){ cut = i; break; }
+      }
+      if (cut >= 0) line = line.slice(0, cut);
+    }
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    // print(...)
+    const printMatch = trimmed.match(/^print\s*\((.*)\)\s*;?\s*$/s);
+    if (printMatch){
+      const inner = printMatch[1];
+      // Пустой print()
+      if (!inner.trim()){
+        output.push('');
+        continue;
+      }
+      // Разбиваем по запятым верхнего уровня
+      const args = splitTopLevel(inner, ',');
+      const parts = args.map(arg => {
+        const a = arg.trim();
+        if (!a) return '';
+        // f-строка
+        const fm = a.match(/^[fF](['"])(.*)\1$/s);
+        if (fm){
+          return parseFString(fm[2]);
+        }
+        // обычная строка
+        const sm = a.match(/^(['"])(.*)\1$/s);
+        if (sm){
+          return sm[2];
+        }
+        // выражение
+        const val = safeEval(a);
+        return pyRepr(val);
+      });
+      // В Python print с несколькими аргументами разделяет их пробелом
+      output.push(parts.join(' '));
+      continue;
+    }
+
+    // Присваивание: name = выражение (одна переменная слева)
+    const assignMatch = trimmed.match(/^([A-Za-z_][\w]*)\s*=\s*(.+)$/s);
+    if (assignMatch){
+      const name = assignMatch[1];
+      const exprRaw = assignMatch[2].trim();
+      // f-строка?
+      const fm = exprRaw.match(/^[fF](['"])(.*)\1$/s);
+      if (fm){
+        vars[name] = parseFString(fm[2]);
+        continue;
+      }
+      // обычная строка?
+      const sm = exprRaw.match(/^(['"])(.*)\1$/s);
+      if (sm){
+        vars[name] = sm[2];
+        continue;
+      }
+      // арифметика
+      try {
+        vars[name] = safeEval(exprRaw);
+      } catch (e){
+        throw new Error('Строка «' + trimmed + '»: ' + e.message);
+      }
+      continue;
+    }
+
+    // Если ничего не подошло — сообщаем
+    throw new Error('Не понимаю строку: «' + trimmed + '». Мини-интерпретатор поддерживает только присваивания, print() и арифметику.');
+  }
+
+  return output.join('\n');
+}
+
+/* =============================================================
+   БАЗА ЗАДАЧ (40 штук)
+   ============================================================= */
+const TASKS = [
+  /* ---------- БЛОК 1: базовые на print и переменные (1–20) ---------- */
+  {
+    id: 1, difficulty: 1, block: 1,
+    title: "Первый print",
+    desc: "Выведи на экран слово <code>Привет</code>.",
+    expectedOutput: "Привет",
+    hints: ["Используй функцию <code>print()</code>.", "Внутри скобок напиши текст в кавычках: <code>print('Привет')</code>."],
+    solution: "print('Привет')",
+    starter: "# Выведи слово Привет\n"
+  },
+  {
+    id: 2, difficulty: 1, block: 1,
+    title: "Две строки",
+    desc: "Выведи на экран два слова в столбик: сначала <code>Кот</code>, потом <code>Пёс</code>.",
+    expectedOutput: "Кот\nПёс",
+    hints: ["Нужно два вызова <code>print()</code>.", "Каждый <code>print()</code> печатает с новой строки.", "Порядок важен: сначала «Кот», потом «Пёс»."],
+    solution: "print('Кот')\nprint('Пёс')",
+    starter: "# Выведи Кот и Пёс каждый с новой строки\n"
+  },
+  {
+    id: 3, difficulty: 1, block: 1,
+    title: "Переменная и print",
+    desc: "Создай переменную <code>x = 42</code> и выведи её на экран.",
+    expectedOutput: "42",
+    hints: ["Переменная: <code>x = 42</code>.", "Печатаем без кавычек: <code>print(x)</code>.", "Число печатается как есть."],
+    solution: "x = 42\nprint(x)",
+    starter: "# Создай x и выведи его\n"
+  },
+  {
+    id: 4, difficulty: 1, block: 1,
+    title: "Строка в переменной",
+    desc: "Создай переменную <code>name = 'Мурка'</code> и выведи её значение.",
+    expectedOutput: "Мурка",
+    hints: ["Строка — в кавычках: <code>name = 'Мурка'</code>.", "Выведи через <code>print(name)</code>."],
+    solution: "name = 'Мурка'\nprint(name)",
+    starter: "# Создай переменную name и выведи её\n"
+  },
+  {
+    id: 5, difficulty: 1, block: 1,
+    title: "Склейка строк",
+    desc: "Создай <code>a = 'Мяу'</code> и <code>b = 'Гав'</code>. Выведи их вместе через дефис: <code>Мяу-Гав</code>.",
+    expectedOutput: "Мяу-Гав",
+    hints: ["Строки можно склеивать через <code>+</code>.", "Соединительная строка — это <code>'-'</code> в кавычках.", "Пример: <code>print(a + '-' + b)</code>."],
+    solution: "a = 'Мяу'\nb = 'Гав'\nprint(a + '-' + b)",
+    starter: "a = 'Мяу'\nb = 'Гав'\n# Выведи их через дефис\n"
+  },
+  {
+    id: 6, difficulty: 1, block: 1,
+    title: "Повтор строки",
+    desc: "Выведи слово <code>Ха</code> три раза подряд без пробелов: <code>ХаХаХа</code>.",
+    expectedOutput: "ХаХаХа",
+    hints: ["В Python строка умножается на число: <code>'Ха' * 3</code>.", "Можно сохранить в переменную и потом напечатать.", "Или сразу: <code>print('Ха' * 3)</code>."],
+    solution: "print('Ха' * 3)",
+    starter: "# Выведи Ха три раза подряд\n"
+  },
+  {
+    id: 7, difficulty: 1, block: 1,
+    title: "Сумма двух чисел",
+    desc: "Создай <code>a = 7</code> и <code>b = 5</code>. Выведи их сумму.",
+    expectedOutput: "12",
+    hints: ["Сумма — знак <code>+</code>.", "Вывести: <code>print(a + b)</code>."],
+    solution: "a = 7\nb = 5\nprint(a + b)",
+    starter: "a = 7\nb = 5\n"
+  },
+  {
+    id: 8, difficulty: 1, block: 1,
+    title: "Разность",
+    desc: "Создай <code>a = 100</code>, <code>b = 42</code>. Выведи <code>a - b</code>.",
+    expectedOutput: "58",
+    hints: ["Разность — знак <code>-</code>.", "Порядок важен: <code>a - b</code>, а не наоборот.", "Выведи <code>print(a - b)</code>."],
+    solution: "a = 100\nb = 42\nprint(a - b)",
+    starter: "a = 100\nb = 42\n"
+  },
+  {
+    id: 9, difficulty: 1, block: 1,
+    title: "Произведение",
+    desc: "Создай <code>a = 6</code>, <code>b = 9</code>. Выведи их произведение.",
+    expectedOutput: "54",
+    hints: ["Умножение — знак <code>*</code>.", "Вывести: <code>print(a * b)</code>."],
+    solution: "a = 6\nb = 9\nprint(a * b)",
+    starter: "a = 6\nb = 9\n"
+  },
+  {
+    id: 10, difficulty: 1, block: 1,
+    title: "Деление",
+    desc: "Создай <code>a = 20</code>, <code>b = 4</code>. Выведи результат <code>a / b</code>.",
+    expectedOutput: "5.0",
+    hints: ["Деление в Python — знак <code>/</code>.", "Оно всегда даёт дробное число, даже если делится нацело.", "Значит результат будет <code>5.0</code>, а не <code>5</code>."],
+    solution: "a = 20\nb = 4\nprint(a / b)",
+    starter: "a = 20\nb = 4\n"
+  },
+  {
+    id: 11, difficulty: 2, block: 1,
+    title: "Целочисленное деление",
+    desc: "Создай <code>a = 17</code>, <code>b = 5</code>. Выведи результат целочисленного деления <code>a // b</code>.",
+    expectedOutput: "3",
+    hints: ["Целочисленное деление — знак <code>//</code>.", "Оно отбрасывает дробную часть.", "<code>17 // 5</code> = <code>3</code>."],
+    solution: "a = 17\nb = 5\nprint(a // b)",
+    starter: "a = 17\nb = 5\n"
+  },
+  {
+    id: 12, difficulty: 2, block: 1,
+    title: "Остаток от деления",
+    desc: "Создай <code>a = 17</code>, <code>b = 5</code>. Выведи остаток от деления.",
+    expectedOutput: "2",
+    hints: ["Остаток — знак <code>%</code>.", "<code>17 % 5</code> = <code>2</code>."],
+    solution: "a = 17\nb = 5\nprint(a % b)",
+    starter: "a = 17\nb = 5\n"
+  },
+  {
+    id: 13, difficulty: 2, block: 1,
+    title: "Возведение в степень",
+    desc: "Создай <code>x = 4</code>. Выведи <code>x</code> в кубе (в 3-й степени).",
+    expectedOutput: "64",
+    hints: ["Степень — знак <code>**</code>.", "Куб — это <code>x ** 3</code>.", "Не путай с <code>x * 3</code>."],
+    solution: "x = 4\nprint(x ** 3)",
+    starter: "x = 4\n"
+  },
+  {
+    id: 14, difficulty: 2, block: 1,
+    title: "Порядок операций",
+    desc: "Создай <code>a = 2</code>, <code>b = 3</code>, <code>c = 4</code>. Выведи <code>a + b * c</code>.",
+    expectedOutput: "14",
+    hints: ["Умножение выполняется раньше сложения.", "Сначала <code>b * c = 12</code>, потом <code>a + 12 = 14</code>.", "Просто напиши <code>print(a + b * c)</code>."],
+    solution: "a = 2\nb = 3\nc = 4\nprint(a + b * c)",
+    starter: "a = 2\nb = 3\nc = 4\n"
+  },
+  {
+    id: 15, difficulty: 2, block: 1,
+    title: "Скобки меняют всё",
+    desc: "Те же числа: <code>a = 2</code>, <code>b = 3</code>, <code>c = 4</code>. Выведи <code>(a + b) * c</code>.",
+    expectedOutput: "20",
+    hints: ["Скобки заставляют сложение сработать первым.", "<code>a + b = 5</code>, потом <code>5 * 4 = 20</code>.", "Скобки обязательны: <code>print((a + b) * c)</code>."],
+    solution: "a = 2\nb = 3\nc = 4\nprint((a + b) * c)",
+    starter: "a = 2\nb = 3\nc = 4\n"
+  },
+  {
+    id: 16, difficulty: 2, block: 1,
+    title: "Склейка числа и строки",
+    desc: "Создай <code>age = 12</code>. Выведи строку: <code>Мне 12 лет</code>. Используй <code>str(age)</code> для преобразования числа в строку.",
+    expectedOutput: "Мне 12 лет",
+    hints: ["Нельзя склеивать строку с числом напрямую — Python выдаст ошибку.", "Преобразуй число в строку: <code>str(age)</code>.", "Пример: <code>print('Мне ' + str(age) + ' лет')</code>."],
+    solution: "age = 12\nprint('Мне ' + str(age) + ' лет')",
+    starter: "age = 12\n"
+  },
+  {
+    id: 17, difficulty: 2, block: 1,
+    title: "f-строка",
+    desc: "Создай <code>name = 'Аня'</code>, <code>age = 12</code>. Выведи через f-строку: <code>Аня, 12 лет</code>.",
+    expectedOutput: "Аня, 12 лет",
+    hints: ["f-строка начинается с буквы <code>f</code> перед кавычкой.", "Внутри фигурных скобок подставляются переменные.", "Пример: <code>print(f'{name}, {age} лет')</code>."],
+    solution: "name = 'Аня'\nage = 12\nprint(f'{name}, {age} лет')",
+    starter: "name = 'Аня'\nage = 12\n"
+  },
+  {
+    id: 18, difficulty: 2, block: 1,
+    title: "Несколько аргументов print",
+    desc: "Создай <code>a = 'один'</code>, <code>b = 'два'</code>, <code>c = 'три'</code>. Выведи их через <code>print(a, b, c)</code>.",
+    expectedOutput: "один два три",
+    hints: ["<code>print()</code> принимает несколько аргументов через запятую.", "Он сам разделяет их пробелом.", "Пример: <code>print(a, b, c)</code>."],
+    solution: "a = 'один'\nb = 'два'\nc = 'три'\nprint(a, b, c)",
+    starter: "a = 'один'\nb = 'два'\nc = 'три'\n"
+  },
+  {
+    id: 19, difficulty: 2, block: 1,
+    title: "Среднее двух чисел",
+    desc: "Создай <code>a = 4</code>, <code>b = 7</code>. Выведи их среднее арифметическое.",
+    expectedOutput: "5.5",
+    hints: ["Среднее = (a + b) / 2.", "Скобки обязательны.", "Иначе сначала поделится <code>b</code>, а не сумма."],
+    solution: "a = 4\nb = 7\nprint((a + b) / 2)",
+    starter: "a = 4\nb = 7\n"
+  },
+  {
+    id: 20, difficulty: 2, block: 1,
+    title: "Пересчёт минут в секунды",
+    desc: "Создай <code>minutes = 7</code>. Выведи, сколько это секунд.",
+    expectedOutput: "420",
+    hints: ["1 минута = 60 секунд.", "Значит: <code>minutes * 60</code>.", "Вывести: <code>print(minutes * 60)</code>."],
+    solution: "minutes = 7\nprint(minutes * 60)",
+    starter: "minutes = 7\n"
+  },
+
+  /* ---------- БЛОК 2: арифметика и составные (21–40) ---------- */
+  {
+    id: 21, difficulty: 1, block: 2,
+    title: "Периметр квадрата",
+    desc: "Сторона квадрата <code>a = 6</code>. Выведи периметр.",
+    expectedOutput: "24",
+    hints: ["Периметр квадрата = 4 × сторона.", "Формула: <code>4 * a</code>."],
+    solution: "a = 6\nprint(4 * a)",
+    starter: "a = 6\n"
+  },
+  {
+    id: 22, difficulty: 1, block: 2,
+    title: "Площадь прямоугольника",
+    desc: "Стороны <code>a = 4</code>, <code>b = 9</code>. Выведи площадь.",
+    expectedOutput: "36",
+    hints: ["Площадь = <code>a * b</code>."],
+    solution: "a = 4\nb = 9\nprint(a * b)",
+    starter: "a = 4\nb = 9\n"
+  },
+  {
+    id: 23, difficulty: 1, block: 2,
+    title: "Периметр прямоугольника",
+    desc: "Стороны <code>a = 5</code>, <code>b = 8</code>. Выведи периметр: <code>2 * (a + b)</code>.",
+    expectedOutput: "26",
+    hints: ["Периметр прямоугольника = 2 × (a + b).", "Скобки обязательны."],
+    solution: "a = 5\nb = 8\nprint(2 * (a + b))",
+    starter: "a = 5\nb = 8\n"
+  },
+  {
+    id: 24, difficulty: 2, block: 2,
+    title: "Площадь круга",
+    desc: "Радиус <code>r = 5</code>. Выведи площадь круга, округлив до 2 знаков. Используй <code>round(...)</code>.",
+    expectedOutput: "78.54",
+    hints: ["Площадь круга = π·r². Возьми π = 3.14159.", "Степень: <code>r ** 2</code>.", "Округление: <code>round(x, 2)</code>."],
+    solution: "r = 5\npi = 3.14159\nprint(round(pi * r ** 2, 2))",
+    starter: "r = 5\npi = 3.14159\n"
+  },
+  {
+    id: 25, difficulty: 2, block: 2,
+    title: "Секунды → минуты",
+    desc: "Всего секунд <code>s = 185</code>. Выведи, сколько это полных минут.",
+    expectedOutput: "3",
+    hints: ["Полных минут — целочисленное деление на 60.", "Знак <code>//</code>.", "Формула: <code>s // 60</code>."],
+    solution: "s = 185\nprint(s // 60)",
+    starter: "s = 185\n"
+  },
+  {
+    id: 26, difficulty: 2, block: 2,
+    title: "Секунды → остаток",
+    desc: "Всего секунд <code>s = 185</code>. Выведи остаток секунд после выделения полных минут.",
+    expectedOutput: "5",
+    hints: ["Остаток — знак <code>%</code>.", "Формула: <code>s % 60</code>."],
+    solution: "s = 185\nprint(s % 60)",
+    starter: "s = 185\n"
+  },
+  {
+    id: 27, difficulty: 2, block: 2,
+    title: "Кг → граммы",
+    desc: "Вес <code>kg = 2</code>. Выведи вес в граммах.",
+    expectedOutput: "2000",
+    hints: ["1 кг = 1000 г.", "Умножь на 1000."],
+    solution: "kg = 2\nprint(kg * 1000)",
+    starter: "kg = 2\n"
+  },
+  {
+    id: 28, difficulty: 2, block: 2,
+    title: "Сдача в магазине",
+    desc: "Цена <code>price = 340</code>, дали <code>given = 500</code>. Выведи сдачу.",
+    expectedOutput: "160",
+    hints: ["Сдача = given − price.", "Порядок важен."],
+    solution: "price = 340\ngiven = 500\nprint(given - price)",
+    starter: "price = 340\ngiven = 500\n"
+  },
+  {
+    id: 29, difficulty: 2, block: 2,
+    title: "Стоимость покупки",
+    desc: "Цена <code>price = 120</code>, количество <code>count = 7</code>. Выведи общую стоимость.",
+    expectedOutput: "840",
+    hints: ["Общая = цена × количество."],
+    solution: "price = 120\ncount = 7\nprint(price * count)",
+    starter: "price = 120\ncount = 7\n"
+  },
+  {
+    id: 30, difficulty: 2, block: 2,
+    title: "Цена со скидкой",
+    desc: "Цена <code>price = 250</code>. Скидка 20%. Выведи цену со скидкой.",
+    expectedOutput: "200.0",
+    hints: ["Скидка 20% значит остаётся 80% цены.", "Множитель 0.8.", "Формула: <code>price * 0.8</code>."],
+    solution: "price = 250\nprint(price * 0.8)",
+    starter: "price = 250\n"
+  },
+  {
+    id: 31, difficulty: 3, block: 2,
+    title: "Цена с наценкой",
+    desc: "Цена <code>price = 200</code>. Наценка 15%. Выведи итоговую стоимость.",
+    expectedOutput: "230.0",
+    hints: ["Наценка 15% = умножить на 1.15.", "Формула: <code>price * 1.15</code>."],
+    solution: "price = 200\nprint(price * 1.15)",
+    starter: "price = 200\n"
+  },
+  {
+    id: 32, difficulty: 3, block: 2,
+    title: "Часы и минуты",
+    desc: "Часов <code>h = 2</code>, минут <code>m = 30</code>. Выведи общее число минут.",
+    expectedOutput: "150",
+    hints: ["1 час = 60 минут.", "Формула: <code>h * 60 + m</code>."],
+    solution: "h = 2\nm = 30\nprint(h * 60 + m)",
+    starter: "h = 2\nm = 30\n"
+  },
+  {
+    id: 33, difficulty: 3, block: 2,
+    title: "Копейки в рубли",
+    desc: "Всего копеек <code>k = 875</code>. Выведи целое число рублей.",
+    expectedOutput: "8",
+    hints: ["1 рубль = 100 копеек.", "Целых рублей — целочисленное деление на 100."],
+    solution: "k = 875\nprint(k // 100)",
+    starter: "k = 875\n"
+  },
+  {
+    id: 34, difficulty: 3, block: 2,
+    title: "Остаток копеек",
+    desc: "Всего копеек <code>k = 875</code>. Выведи остаток копеек после выделения рублей.",
+    expectedOutput: "75",
+    hints: ["Остаток — знак <code>%</code>.", "Формула: <code>k % 100</code>."],
+    solution: "k = 875\nprint(k % 100)",
+    starter: "k = 875\n"
+  },
+  {
+    id: 35, difficulty: 3, block: 2,
+    title: "Средняя скорость",
+    desc: "Путь <code>s = 240</code> км, время <code>t = 3</code> часа. Выведи среднюю скорость.",
+    expectedOutput: "80.0",
+    hints: ["Скорость = путь / время.", "Формула: <code>s / t</code>.", "Деление <code>/</code> даст дробное."],
+    solution: "s = 240\nt = 3\nprint(s / t)",
+    starter: "s = 240\nt = 3\n"
+  },
+  {
+    id: 36, difficulty: 3, block: 2,
+    title: "Гипотенуза (приближённо)",
+    desc: "Катеты <code>a = 3</code>, <code>b = 4</code>. Выведи квадрат гипотенузы: <code>a² + b²</code>.",
+    expectedOutput: "25",
+    hints: ["Квадрат — это <code>** 2</code>.", "Сумма квадратов катетов = квадрат гипотенузы.", "Формула: <code>a ** 2 + b ** 2</code>."],
+    solution: "a = 3\nb = 4\nprint(a ** 2 + b ** 2)",
+    starter: "a = 3\nb = 4\n"
+  },
+  {
+    id: 37, difficulty: 3, block: 2,
+    title: "Площадь треугольника",
+    desc: "Основание <code>a = 10</code>, высота <code>h = 6</code>. Выведи площадь треугольника.",
+    expectedOutput: "30.0",
+    hints: ["Площадь = ½ × a × h.", "В коде: <code>0.5 * a * h</code>."],
+    solution: "a = 10\nh = 6\nprint(0.5 * a * h)",
+    starter: "a = 10\nh = 6\n"
+  },
+  {
+    id: 38, difficulty: 3, block: 2,
+    title: "Объём куба",
+    desc: "Ребро куба <code>a = 4</code>. Выведи его объём.",
+    expectedOutput: "64",
+    hints: ["Объём куба = a³.", "Степень: <code>a ** 3</code>."],
+    solution: "a = 4\nprint(a ** 3)",
+    starter: "a = 4\n"
+  },
+  {
+    id: 39, difficulty: 3, block: 2,
+    title: "Три числа: сумма и произведение",
+    desc: "Даны <code>a = 2</code>, <code>b = 3</code>, <code>c = 5</code>. Выведи сначала сумму, потом произведение — каждое с новой строки.",
+    expectedOutput: "10\n30",
+    hints: ["Сумма: <code>a + b + c</code>.", "Произведение: <code>a * b * c</code>.", "Порядок вывода важен: сначала сумма, потом произведение."],
+    solution: "a = 2\nb = 3\nc = 5\nprint(a + b + c)\nprint(a * b * c)",
+    starter: "a = 2\nb = 3\nc = 5\n"
+  },
+  {
+    id: 40, difficulty: 3, block: 2,
+    title: "Полный отчёт о питомце",
+    desc: "Даны <code>name = 'Барсик'</code>, <code>age = 3</code>, <code>weight = 4.5</code>. Выведи через f-строку: <code>Кот Барсик, 3 года, вес 4.5 кг</code>.",
+    expectedOutput: "Кот Барсик, 3 года, вес 4.5 кг",
+    hints: ["f-строка: <code>f'...'</code> с фигурными скобками для переменных.", "Все три переменные подставляются через <code>{name}</code>, <code>{age}</code>, <code>{weight}</code>.", "Пример: <code>print(f'Кот {name}, {age} года, вес {weight} кг')</code>."],
+    solution: "name = 'Барсик'\nage = 3\nweight = 4.5\nprint(f'Кот {name}, {age} года, вес {weight} кг')",
+    starter: "name = 'Барсик'\nage = 3\nweight = 4.5\n"
+  }
+];
+
+/* =============================================================
+   Отрисовка карточек
+   ============================================================= */
+const tasksEl = document.getElementById('tasks');
+const solvedCountEl = document.getElementById('solvedCount');
+const totalCountEl = document.getElementById('totalCount');
+const solvedSet = new Set();
+
+totalCountEl.textContent = TASKS.length;
+
+TASKS.forEach(t => {
+  const hintsHTML = t.hints.map(h => `<li>${h}</li>`).join('');
+  const diffClass = 'diff-' + t.difficulty;
+  const diffLabel = ['', 'Легко', 'Средне', 'Сложно'][t.difficulty];
+
+  const div = document.createElement('div');
+  div.className = 'task';
+  div.id = 'task-' + t.id;
+  div.dataset.difficulty = t.difficulty;
+  div.dataset.block = t.block;
+  div.innerHTML = `
+    <div class="task-head">
+      <div class="task-title">
+        <span class="num">${t.id}</span>
+        ${t.title}
+        <span class="difficulty ${diffClass}">${diffLabel}</span>
+      </div>
+      <div id="badge-${t.id}"></div>
+    </div>
+    <div class="task-desc">${t.desc}</div>
+    <div class="io-block">
+      <div><b>Ожидаемый вывод:</b></div>
+      <pre>${escapeHtml(t.expectedOutput)}</pre>
+    </div>
+
+    <div class="editor-wrap">
+      <div class="line-numbers" id="lines-${t.id}">1</div>
+      <textarea id="editor-${t.id}" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">${escapeHtml(t.starter)}</textarea>
+    </div>
+
+    <div class="actions">
+      <button class="primary" data-run="${t.id}">▶ Запустить</button>
+      <button class="ghost" data-reset="${t.id}">↺ Сбросить</button>
+      <button class="hint-btn" data-hint="${t.id}">💡 Подсказки (${t.hints.length})</button>
+      <button class="ghost" data-solution="${t.id}" style="display:none">📖 Показать решение</button>
+    </div>
+
+    <div class="hint-box" id="hint-${t.id}">
+      <b>Подсказки — читай по одной:</b>
+      <ol>${hintsHTML}</ol>
+    </div>
+
+    <div class="output" id="out-${t.id}"></div>
+
+    <div class="solution-box" id="sol-${t.id}">
+      <b>Пример решения:</b>
+      <pre>${escapeHtml(t.solution)}</pre>
+    </div>
+  `;
+  tasksEl.appendChild(div);
+});
+
+function escapeHtml(s){
+  return String(s)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;');
+}
+
+/* =============================================================
+   Редакторы: Tab = 4 пробела, нумерация, автоувеличение
+   ============================================================= */
+window.addEventListener('DOMContentLoaded', () => {
+  TASKS.forEach(t => {
+    const ta = document.getElementById('editor-' + t.id);
+    const lines = document.getElementById('lines-' + t.id);
+
+    const updateLines = () => {
+      const count = ta.value.split('\n').length;
+      let s = '';
+      for (let i = 1; i <= count; i++) s += i + '\n';
+      lines.textContent = s.replace(/\n$/, '');
+    };
+    const autosize = () => {
+      ta.style.height = 'auto';
+      ta.style.height = Math.max(130, ta.scrollHeight) + 'px';
+    };
+
+    ta.addEventListener('input', () => { updateLines(); autosize(); });
+    ta.addEventListener('scroll', () => { lines.scrollTop = ta.scrollTop; });
+
+    ta.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab'){
+        e.preventDefault();
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        ta.value = ta.value.substring(0, start) + '    ' + ta.value.substring(end);
+        ta.selectionStart = ta.selectionEnd = start + 4;
+        updateLines(); autosize();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+        e.preventDefault();
+        runTask(t.id);
+      }
+    });
+
+    updateLines(); autosize();
+  });
+
+  // Кнопки
+  tasksEl.addEventListener('click', (e) => {
+    const run = e.target.closest('[data-run]');
+    if (run) return runTask(parseInt(run.dataset.run, 10));
+
+    const reset = e.target.closest('[data-reset]');
+    if (reset){
+      const id = parseInt(reset.dataset.reset, 10);
+      const t = TASKS.find(x => x.id === id);
+      const ta = document.getElementById('editor-' + id);
+      ta.value = t.starter;
+      ta.dispatchEvent(new Event('input'));
+      const out = document.getElementById('out-' + id);
+      out.className = 'output'; out.innerHTML = '';
+      return;
+    }
+
+    const hint = e.target.closest('[data-hint]');
+    if (hint){
+      const id = parseInt(hint.dataset.hint, 10);
+      document.getElementById('hint-' + id).classList.toggle('show');
+      return;
+    }
+
+    const sol = e.target.closest('[data-solution]');
+    if (sol){
+      const id = parseInt(sol.dataset.solution, 10);
+      document.getElementById('sol-' + id).classList.toggle('show');
+      return;
+    }
+  });
+
+  // Фильтр
+  document.getElementById('filterBar').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-filter]');
+    if (!b) return;
+    document.querySelectorAll('#filterBar button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    const f = b.dataset.filter;
+    document.querySelectorAll('.task').forEach(task => {
+      const id = parseInt(task.id.replace('task-',''));
+      const diff = task.dataset.difficulty;
+      const solved = solvedSet.has(id);
+      let show = true;
+      if (f === 'all') show = true;
+      else if (f === 'solved') show = solved;
+      else if (f === 'unsolved') show = !solved;
+      else show = diff === f;
+      task.classList.toggle('hidden', !show);
+    });
+  });
+});
+
+/* =============================================================
+   Запуск и проверка
+   ============================================================= */
+function runTask(id){
+  const t = TASKS.find(x => x.id === id);
+  const out = document.getElementById('out-' + id);
+  const code = document.getElementById('editor-' + id).value;
+
+  if (!code.trim()){
+    out.className = 'output show warn';
+    out.innerHTML = `<span class="label">Пусто</span>Напиши код в редакторе.`;
+    return;
+  }
+
+  let actual;
+  try {
+    actual = runPythonMini(code);
+  } catch (e){
+    out.className = 'output show fail';
+    out.innerHTML =
+      `<span class="label">Ошибка в коде</span>${escapeHtml(e.message)}`;
+    return;
+  }
+
+  const normalize = s => String(s).replace(/\r\n/g, '\n').replace(/[ \t]+$/gm, '').trim();
+  const got = normalize(actual);
+  const want = normalize(t.expectedOutput);
+
+  if (got === want){
+    out.className = 'output show ok';
+    out.innerHTML =
+      `<span class="label">Верно!</span>` +
+      `Вывод программы:<pre>${escapeHtml(got)}</pre>`;
+    markSolved(id);
+  } else {
+    out.className = 'output show fail';
+    out.innerHTML =
+      `<span class="label">Не совпало</span>` +
+      `Вывод твоей программы:<pre>${escapeHtml(got || '(пусто)')}</pre>` +
+      `Ожидалось:<pre>${escapeHtml(want)}</pre>`;
+  }
+}
+
+function markSolved(id){
+  if (solvedSet.has(id)) return;
+  solvedSet.add(id);
+  document.getElementById('task-' + id).classList.add('solved');
+  document.getElementById('badge-' + id).innerHTML =
+    `<span class="badge-solved">✓ решено</span>`;
+  const solBtn = document.querySelector(`[data-solution="${id}"]`);
+  if (solBtn) solBtn.style.display = 'inline-block';
+  solvedCountEl.textContent = solvedSet.size;
+}
+</script>
+</body>
+</html>
